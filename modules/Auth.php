@@ -106,94 +106,132 @@ class Auth
 				return $this->gm->response($payload, $remarks, $message, $code);
 			}
     }
+
+
+
     public function user_login($data)
     {
         $payload = [];
         $code = 404;
         $remarks = "failed";
         $message = "No Record found";
-
-        try{
-                $sql = "SELECT * FROM user_tbl WHERE email = ? LIMIT 1";
-                $sql = $this->pdo->prepare($sql);
-                $sql->execute([	
-                    $data->username
-                ]);
-
-                $res = $sql->fetch(PDO::FETCH_ASSOC);
-                $username = $res["email"];
-                $id = $res["user_id"];
-                $firstname = $res["firstname"];
-                $lastname = $res["lastname"];
-                if (password_verify($data->password, $res['password'])) {
-                        $payload = [
-                            "firstname" => $firstname,
-                            "lastname" => $lastname,
-                            "username" => $username,
-                            "id" => $id
-                        ];
-						$code = 200;
-						$remarks = "success";
-						$message = "Login success.";
-                     return $this->gm->response($payload, $remarks, $message, $code);
-                        
-					}
-
-                    $code = 404;
-                    $remarks = "failed";
-                    $message = "No Record found";
-                    return $this->gm->response($payload, $remarks, $message, $code);
-
+        try {
+           
+            $sql = "SELECT * FROM user_tbl WHERE passbook_no = ? LIMIT 1";
+            $sql = $this->pdo->prepare($sql);
+            $sql->execute([$data->username]);
+            
+            $res = $sql->fetch(PDO::FETCH_ASSOC);
+            
+            $username = $res["passbook_no"];
+            $id = $res["id"];
+            $firstname = $res["first_name"];
+            $lastname = $res["last_name"];
+            $hashedPassword = $res['password'];
+    
+            if (password_verify($data->password, $hashedPassword)) {
+                $payload = [
+                    "firstname" => $firstname,
+                    "lastname" => $lastname,
+                    "username" => $username,
+                    "id" => $id
+                ];
                 
-            } catch (\PDOException $e) {
-				return $this->gm->response($payload, $remarks, $message, $code);
-			}
+                $code = 200;
+                $remarks = "success";
+                $message = "Login success.";
+                return $this->gm->response($payload, $remarks, $message, $code);
+            }
+    
+            $code = 404;
+            $remarks = "failed";
+            $message = "No Record found";
+            return $this->gm->response($payload, $remarks, $message, $code);
+    
+        } catch (\PDOException $e) {
+            return $this->gm->response($payload, $remarks, $message, $code);
+        }
     }
-
-    public function user_signup($data)
+    
+    public function hash_pass()
     {
+       
         $payload = [];
         $code = 404;
         $remarks = "failed";
         $message = "No Record found";
 
-        try{
-                $sql = "SELECT * FROM user_tbl WHERE email = ? LIMIT 1";
-                $sql = $this->pdo->prepare($sql);
-                $sql->execute([	
-                    $data->email
-                ]);
+       try{
+            
+        $sql = "SELECT * FROM user_tbl";
+
+        $res = $this->gm->executeQuery($sql);
+
+        foreach ($res['data'] as $value) 
+        {
+         
+            $this->pdo->beginTransaction();
+
+            $sql = "UPDATE user_tbl SET password = ? WHERE id = ?";
+            $sql = $this->pdo->prepare($sql);
+            $sql->execute([password_hash($value['password'], PASSWORD_DEFAULT) ,$value['id']]);
+            $this->pdo->commit();
+
+        }
+         
+        $code = 200;
+        $remarks = "success";
+        $message = "Successfully updated requested records";
+
+        } catch(\PDOException $e){
+
+        }
+    }
+
+    // public function user_signup($data)
+    // {
+    //     $payload = [];
+    //     $code = 404;
+    //     $remarks = "failed";
+    //     $message = "No Record found";
+
+    //     try{
+    //             $sql = "SELECT * FROM user_tbl WHERE email = ? LIMIT 1";
+    //             $sql = $this->pdo->prepare($sql);
+    //             $sql->execute([	
+    //                 $data->e
+    //             ]);
 
                
-                $count = $sql->rowCount();
+    //             $count = $sql->rowCount();
                
-                if ($count > 0) {
-                    $message = 'Email already registered';
-                    return $this->gm->response($payload, $remarks, $message, $code);
+    //             if ($count > 0) {
+    //                 $message = 'passbook_no already registered';
+    //                 return $this->gm->response($payload, $remarks, $message, $code);
 
-                } else {
+    //             } else {
                     
 
-                    $sql = "INSERT INTO user_tbl (firstname,lastname,email,password) VALUES (?,?,?,?)";
-                    $sql = $this->pdo->prepare($sql);
-                    $sql->execute([
-                        $data->firstname,
-                        $data->lastname,	
-                        $data->email, 
-                         password_hash($data->password, PASSWORD_DEFAULT)
-                    ]);
-                    $code = 200;
-                    $remarks = "success";
-                    $message = "Successfully inserted data";
+    //                 $sql = "INSERT INTO user_tbl (firstname,lastname,email,password) VALUES (?,?,?,?)";
+    //                 $sql = $this->pdo->prepare($sql);
+    //                 $sql->execute([
+    //                     $data->firstname,
+    //                     $data->lastname,	
+    //                     $data->passbook_no, 
+    //                      password_hash($data->password, PASSWORD_DEFAULT)
+    //                 ]);
+    //                 $code = 200;
+    //                 $remarks = "success";
+    //                 $message = "Successfully inserted data";
 
-                    return $this->gm->response($payload, $remarks, $message, $code);
-                }
+    //                 return $this->gm->response($payload, $remarks, $message, $code);
+    //             }
 
                 
-            } catch (\PDOException $e) {
-				return $this->gm->response($payload, $remarks, $message, $code);
-			}
-    }
+    //         } catch (\PDOException $e) {
+	// 			return $this->gm->response($payload, $remarks, $message, $code);
+	// 		}
+    // }
 
     public function changePass($data,$id){
         $payload = [];

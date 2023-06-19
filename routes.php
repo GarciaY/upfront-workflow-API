@@ -36,6 +36,10 @@
 				case 'user_login':
 					echo json_encode($auth->user_login($d));
 					break;
+				
+				case 'hash_pass':
+					echo json_encode($auth->hash_pass());
+					break;	
 
 				case 'admin_Register':
 					echo json_encode($auth->admin_Register($d));
