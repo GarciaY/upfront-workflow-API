@@ -54,6 +54,10 @@
 					echo json_encode($post->update_loan_disapproved($req[1]));
 					break;
 
+				case 'update_loan_notify':
+					echo json_encode($post->update_loan_notify($req[1]));
+					break;
+
 				case 'update_loan':
 					echo json_encode($post->update_loan_approved($req[1]));
 					break;
@@ -98,6 +102,14 @@
 				case 'History':
 					echo json_encode($get->adminget_Loan_history());
 					break;
+
+				case 'Members':
+					echo json_encode($get->adminget_Members());
+					break;
+
+				case 'MembersHistory':
+					echo json_encode($get->adminget_MembersHistory($req[1]));
+					break;		
 
 				case 'adminget_Loan_one':
 					echo json_encode($get->adminget_Loan_one($req[1]));

@@ -187,7 +187,7 @@
 			try {
 				
 				$sql = "SELECT * FROM personaldata_tbl INNER JOIN loaninformation_tbl ON personaldata_tbl.personal_id = loaninformation_tbl.personal_id
-						WHERE personaldata_tbl.personal_id = $id ";
+						WHERE personaldata_tbl.user_id = $id ";
 			
 				$res = $this->gm->executeQuery($sql);
 	
@@ -263,6 +263,68 @@
 				return $this->gm->response($payload, $remarks, $message, $code);
 			}
 		}
+
+		public function adminget_Members() 
+		{
+			$payload = [];
+			$code = 404;
+			$remarks = "failed";
+			$message = "Unable to retrieve data";
+
+			try {
+				
+				$sql = "SELECT * FROM user_tbl";
+			//;
+				$res = $this->gm->executeQuery($sql);
+	
+					if ($res['code'] == 200) {
+						$payload = $res['data'];
+						$code = 200;
+						$remarks = "success";
+						$message = "Successfully retrieved requested records";
+					}
+
+				return $this->gm->response($payload, $remarks, $message, $code);
+
+			} catch (\PDOException $e) {
+
+				return $this->gm->response($payload, $remarks, $message, $code);
+			}
+		}
+
+		public function adminget_MembersHistory($id) 
+		{
+			
+			$payload = [];
+			$code = 404;
+			$remarks = "failed";
+			$message = "Unable to retrieve data";
+
+			try {
+				
+				$sql = "SELECT * FROM personaldata_tbl INNER JOIN loaninformation_tbl ON personaldata_tbl.personal_id = loaninformation_tbl.personal_id
+						WHERE personaldata_tbl.user_id = $id";
+
+			
+			
+			
+				$res = $this->gm->executeQuery($sql);
+	
+					if ($res['code'] == 200) {
+						$payload = $res['data'];
+						$code = 200;
+						$remarks = "success";
+						$message = "Successfully retrieved requested records";
+					}
+
+				return $this->gm->response($payload, $remarks, $message, $code);
+
+			} catch (\PDOException $e) {
+
+				return $this->gm->response($payload, $remarks, $message, $code);
+			}
+		}
+
 		public function adminget_voucherView($id)
 		{
 			$payload = [];

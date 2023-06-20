@@ -198,9 +198,9 @@
 				return $this->gm->response($payload, $remarks, $message, $code);
 			}
 		}
+
 		public function update_loan_release($id) 
 		{
-
 			$payload = [];
 			$code = 404;
 			$remarks = "failed";
@@ -243,6 +243,52 @@
 				return $this->gm->response($payload, $remarks, $message, $code);
 			}
 		}
+
+		public function update_loan_notify($id) 
+		{
+			$payload = [];
+			$code = 404;
+			$remarks = "failed";
+			$message = "Unable to update data";
+			$status = "Approved";
+			try{
+				// $this->pdo->beginTransaction();
+
+				// $sql = "UPDATE loaninformation_tbl SET loan_status = ? WHERE personal_id = ?";
+				// $sql = $this->pdo->prepare($sql);
+				// $sql->execute([ $status ,$id]);
+				// $this->pdo->commit();
+
+				
+			
+				$sql2 = "SELECT * FROM personaldata_tbl WHERE personal_id = ? LIMIT 1";
+				$sql2 = $this->pdo->prepare($sql2);
+				$sql2->execute([	
+					$id
+				]);
+				
+				$res = $sql2->fetch(PDO::FETCH_ASSOC);
+
+				$user_id = $res["user_id"];
+				
+				$title = "Attention";
+				$content = "Please check your next due of payment on your loan account.";
+
+				$sql3 = "INSERT INTO notif (user_id,personal_id,title,content) VALUES (?,?,?,?)";
+				$sql3 = $this->pdo->prepare($sql3);
+				$sql3->execute([$user_id, $id, $title,$content]);
+
+				$code = 200;
+				$remarks = "success";
+				$message = "Successfully updated notify records";
+				return $this->gm->response($payload, $remarks, $message, $code);
+					
+			} catch (\PDOException $e) {
+				return $this->gm->response($payload, $remarks, $message, $code);
+			}
+		}
+
+
 		public function update_loan_disapproved($id) 
 		{
 
@@ -275,7 +321,7 @@
 				$user_id = $res["user_id"];
 				
 				$title = "Disapproved";
-				$content = "Your loan has been Disapproved. Please try again.";
+				$content = "Your request has been dissapproved, please contact the office for more information. Check Credit Policy";
 
 				$sql3 = "INSERT INTO notif (user_id,personal_id,title,content) VALUES (?,?,?,?)";
 				$sql3 = $this->pdo->prepare($sql3);
