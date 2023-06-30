@@ -302,16 +302,81 @@
 
 			try {
 				
+				$reason = "select * FROM reasoning_tbl WHERE user_id  = $id";
+				$reasonresult = $this->gm->executeQuery($reason);
+
 				$sql = "SELECT * FROM personaldata_tbl INNER JOIN loaninformation_tbl ON personaldata_tbl.personal_id = loaninformation_tbl.personal_id
 						WHERE personaldata_tbl.user_id = $id";
-
-			
-			
 			
 				$res = $this->gm->executeQuery($sql);
+
+				foreach ($res["data"] as $data) {
+
+					$arrayData = [];
+
+					if($reasonresult['code'] == 200 && count($reasonresult['data']) > 0){
+						
+
+						foreach ($reasonresult['data'] as $reason) {
+
+							if ($reason["relational_id"] == $data['loan_id']) {
+
+								$arrayData['personal_id'] = $data["personal_id"];
+								$arrayData['user_id'] = $data["user_id"];
+								$arrayData['Firstname'] = $data["Firstname"];
+								$arrayData['Lastname'] = $data["Lastname"];
+								$arrayData['PassbookNo'] = $data["PassbookNo"];
+								$arrayData['Address'] = $data["Address"];
+								$arrayData['Department'] = $data["Department"];
+								$arrayData['MobileNo'] = $data["MobileNo"];
+								$arrayData['personalMembership'] = $data["personalMembership"];
+								$arrayData['loan_id'] = $data["loan_id"];
+								$arrayData['transactionType'] = $data["transactionType"];
+								$arrayData['loanAmountFigure'] = $data["loanAmountFigure"];
+								$arrayData['loanAmountWords'] = $data["loanAmountWords"];
+								$arrayData['loanType'] = $data["loanType"];
+								$arrayData['loanTerm'] = $data["loanTerm"];
+								$arrayData['paymentFrequency'] = $data["paymentFrequency"];
+								$arrayData['loan_status'] = $data["loan_status"];
+								$arrayData['created_at'] = $data["created_at"];
+								$arrayData['reason'] = $reason["reason"];
+								$arrayData['reason_id'] = $reason["field_id"];
+						}
+
+						$isFound = true;
+						}
+						
+					}else{
+						
+							$arrayData['personal_id'] = $data["personal_id"];
+							$arrayData['user_id'] = $data["user_id"];
+							$arrayData['Firstname'] = $data["Firstname"];
+							$arrayData['Lastname'] = $data["Lastname"];
+							$arrayData['PassbookNo'] = $data["PassbookNo"];
+							$arrayData['Address'] = $data["Address"];
+							$arrayData['Department'] = $data["Department"];
+							$arrayData['MobileNo'] = $data["MobileNo"];
+							$arrayData['personalMembership'] = $data["personalMembership"];
+							$arrayData['loan_id'] = $data["loan_id"];
+							$arrayData['transactionType'] = $data["transactionType"];
+							$arrayData['loanAmountFigure'] = $data["loanAmountFigure"];
+							$arrayData['loanAmountWords'] = $data["loanAmountWords"];
+							$arrayData['loanType'] = $data["loanType"];
+							$arrayData['loanTerm'] = $data["loanTerm"];
+							$arrayData['paymentFrequency'] = $data["paymentFrequency"];
+							$arrayData['loan_status'] = $data["loan_status"];
+							$arrayData['created_at'] = $data["created_at"];
+							$arrayData['reason'] = null;
+							$arrayData['status'] = null;
+							
+					}
+					
+					array_push($payload, $arrayData);
+						
+				}
 	
 					if ($res['code'] == 200) {
-						$payload = $res['data'];
+						$payload = $payload;
 						$code = 200;
 						$remarks = "success";
 						$message = "Successfully retrieved requested records";
@@ -324,6 +389,7 @@
 				return $this->gm->response($payload, $remarks, $message, $code);
 			}
 		}
+		
 
 		public function adminget_voucherView($id)
 		{

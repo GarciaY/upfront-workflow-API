@@ -321,7 +321,7 @@
 				$user_id = $res["user_id"];
 				
 				$title = "Disapproved";
-				$content = "Your request has been dissapproved, please contact the office for more information. Check Credit Policy";
+				$content = "Your request has been dissapproved, please contact the office for more information. Check Loan Policy";
 
 				$sql3 = "INSERT INTO notif (user_id,personal_id,title,content) VALUES (?,?,?,?)";
 				$sql3 = $this->pdo->prepare($sql3);
@@ -334,6 +334,51 @@
 				return $this->gm->response($payload, $remarks, $message, $code);
 			}
 		}
+
+		public function input_Reason($id,$reason)
+		{
+			
+			$payload = [];
+			$code = 404;
+			$remarks = "failed";
+			$message = "Unable to insert data";
+			
+
+			try {
+				$this->pdo->beginTransaction();
+				$replacedString = str_replace("_", " ", $reason);
+				
+				
+				$sql = "INSERT INTO reasoning_tbl (relational_id, reason) VALUES ( ?,?)";
+				$stmt = $this->pdo->prepare($sql);
+				$stmt->execute([ (int)$id, $replacedString]);
+
+				$sql2 = "SELECT * FROM personaldata_tbl WHERE personal_id = ? LIMIT 1 ";
+				$sql2 = $this->pdo->prepare($sql2);
+                $sql2->execute([	
+                    (int)$id
+                ]);
+				$res = $sql2->fetch(PDO::FETCH_ASSOC);
+				
+
+				$sql3 = "INSERT INTO notif (user_id,personal_id,title, content) VALUES (?,?,?,?)";
+				$sql3 = $this->pdo->prepare($sql3);
+				$sql3->execute([$res["user_id"],$res["personal_id"],"Disapproved",$replacedString]);
+				
+				$this->pdo->commit();
+
+				$code = 200;
+				$remarks = "success";
+				$message = "Successfully inserted data";
+
+				return $this->gm->response($payload, $remarks, $message, $code);
+			} catch (\PDOException $e) {
+				return $this->gm->response($payload, $remarks, $message, $code);
+			}
+		}
+
+	
+
 		public function create_notif($data)
 		{
 			$payload = [];

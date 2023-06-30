@@ -54,6 +54,10 @@
 					echo json_encode($post->update_loan_disapproved($req[1]));
 					break;
 
+				case'input_Reason':
+					echo json_encode($post->input_Reason($req[1],$req[2]));
+					break;
+
 				case 'update_loan_notify':
 					echo json_encode($post->update_loan_notify($req[1]));
 					break;
